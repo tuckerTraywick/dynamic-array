@@ -5,14 +5,14 @@
 
 // Represents a dynamic array that can grow and shrink at runtime.
 struct List {
+    size_t elementSize; // The size in bytes of one element.
     size_t capacity; // The number of elements allocated.
     size_t length; // The current number of elements.
-    size_t elementSize; // The size in bytes of one element.
     void *elements; // The buffer containing the elements.
 };
 
 // Returns a new list. The list must be destroy by `listDestroy()`.
-struct List ListCreate(size_t capacity, size_t elementSize);
+struct List ListCreate(size_t elementSize, size_t capacity);
 
 // Deallocates a list's elements and zeroes its memory. Be sure to destroy each element if needed
 // before calling this function.
