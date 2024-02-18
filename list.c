@@ -8,10 +8,8 @@
 static void ListRealloc(struct List *list) {
     if (list->length == list->capacity) {
         list->capacity *= 2;
-    } else if (list->length <= list->capacity/2) {
-        // Leave half of the gap between the last element and the end of the buffer for future
-        // expansion.
-        list->capacity -= (list->capacity - list->length)/2;
+    } else if (list->length < list->capacity/2) {
+        list->capacity /= 2;
     }
     void *newElements = realloc(list->elements, list->elementSize*list->capacity);
     // TODO: Handle failed `realloc()`.
@@ -19,14 +17,14 @@ static void ListRealloc(struct List *list) {
     list->elements = newElements;
 }
 
-struct List ListCreate(size_t capacity, size_t elementSize) {
+struct List ListCreate(size_t elementSize, size_t capacity) {
     void *elements = malloc(elementSize*capacity);
     // TODO: Handle failed `malloc()`.
     assert(elements && "`malloc()` failed.");
     return (struct List){
+        .elementSize = elementSize,
         .capacity = capacity,
         .length = 0,
-        .elementSize = elementSize,
         .elements = elements,
     };
 }
@@ -58,7 +56,7 @@ void ListSwap(struct List *list, size_t indexA, size_t indexB) {
     assert(indexA < list->length && "`indexA` out of bounds.");
     assert(indexB < list->length && "`indexB` out of bounds.");
 
-    // Equivalent to: `*temp = *list[indexA]; *list[indexA] = *list[indexB]; *list[indexB] = *temp;`
+    // Equivalent to: `temp = list[indexA]; list[indexA] = list[indexB]; list[indexB] = temp;`
     void *temp = malloc(list->elementSize);
     // TODO: Handle failed `malloc()`.
     assert(temp && "`malloc()` failed.");
