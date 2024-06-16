@@ -1,5 +1,2 @@
 #!/bin/sh
-./build.sh
-echo
-echo "---- TESTING ----"
-./test
+./build.sh && echo && echo "---- TESTING ----" && ./test
