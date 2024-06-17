@@ -8,11 +8,18 @@
 
 #define getList(elements) ((struct List*)(elements) - 1)
 
-void *getElement(struct List *list, size_t index) {
+struct List {
+    size_t capacity;
+    size_t count;
+    size_t elementSize;
+	char elements[];
+};
+
+static void *getElement(struct List *list, size_t index) {
     return (void*)(list->elements + index*list->elementSize);
 }
 
-void setElement(struct List *list, size_t index, void *value) {
+static void setElement(struct List *list, size_t index, void *value) {
     memcpy(list->elements + index*list->elementSize, value, list->elementSize);
 }
 
@@ -54,21 +61,38 @@ void *ListSetCount(void *list, size_t count) {
     list = ListSetCapacity(list, count);
     struct List *l = getList(list);
     l->count = count;
+    return list;
 }
 
 size_t ListGetElementSize(void *list) {
     return getList(list)->elementSize;
 }
 
-void *ListAppend(void *list, void *element) {
+void *ListInsert(void *list, size_t index, void *element) {
     struct List *l = getList(list);
     if (l->count == l->capacity) {
         l->capacity *= LIST_GROWTH_FACTOR;
         l = realloc(l, sizeof *l + l->capacity*l->elementSize);
     }
-    setElement(l, l->count, element);
+
+    if (index < l->count) {
+        memmove(
+            l->elements + (index + 1)*l->elementSize,
+            l->elements + index*l->elementSize,
+            l->count*l->elementSize
+        );
+    }
+    setElement(l, index, element);
     ++l->count;
     return l + 1;
+}
+
+void *ListAppend(void *list, void *element) {
+    return ListInsert(list, ListGetCount(list), element);
+}
+
+void *ListPrepend(void *list, void *element) {
+    return ListInsert(list, 0, element);
 }
 
 #undef min

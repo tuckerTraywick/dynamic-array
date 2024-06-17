@@ -7,13 +7,6 @@
 	#define LIST_GROWTH_FACTOR 2
 #endif
 
-struct List {
-    size_t capacity;
-    size_t count;
-    size_t elementSize;
-	char elements[];
-};
-
 void *ListCreate(size_t capacity, size_t elementSize);
 
 void ListDestroy(void *list);
@@ -28,12 +21,10 @@ void *ListSetCount(void *list, size_t count);
 
 size_t ListGetElementSize(void *list);
 
+void *ListInsert(void *list, size_t index, void *element);
+
 void *ListAppend(void *list, void *element);
 
-void *getElement(struct List *list, size_t index);
-
-void setElement(struct List *list, size_t index, void *value);
-
-struct List *getList(void *elements);
+void *ListPrepend(void *list, void *element);
 
 #endif // LIST_H
