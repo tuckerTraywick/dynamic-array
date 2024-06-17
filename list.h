@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+// The value the list's capacity is multiplied/divided by when the list needs to grow or shrink.
 #ifndef LIST_GROWTH_FACTOR
 	#define LIST_GROWTH_FACTOR 2
 #endif
