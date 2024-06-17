@@ -15,10 +15,6 @@ struct List {
 	char elements[];
 };
 
-static void *getElement(struct List *list, size_t index) {
-    return (void*)(list->elements + index*list->elementSize);
-}
-
 static void setElement(struct List *list, size_t index, void *value) {
     memcpy(list->elements + index*list->elementSize, value, list->elementSize);
 }
@@ -30,7 +26,7 @@ void *ListCreate(size_t capacity, size_t elementSize) {
         .count = 0,
         .elementSize = elementSize,
     };
-    return &list->elements;
+    return list + 1;
 }
 
 void ListDestroy(void *list) {
@@ -58,9 +54,9 @@ size_t ListGetCount(void *list) {
 }
 
 void *ListSetCount(void *list, size_t count) {
-    list = ListSetCapacity(list, count);
     struct List *l = getList(list);
     l->count = count;
+    list = ListSetCapacity(list, count);
     return list;
 }
 
@@ -68,8 +64,13 @@ size_t ListGetElementSize(void *list) {
     return getList(list)->elementSize;
 }
 
+bool ListIsEmpty(void *list) {
+    return ListGetCount(list) == 0;
+}
+
 void *ListInsert(void *list, size_t index, void *element) {
     struct List *l = getList(list);
+    assert(index <= l->count && "Invalid index.");
     if (l->count == l->capacity) {
         l->capacity *= LIST_GROWTH_FACTOR;
         l = realloc(l, sizeof *l + l->capacity*l->elementSize);
@@ -79,7 +80,7 @@ void *ListInsert(void *list, size_t index, void *element) {
         memmove(
             l->elements + (index + 1)*l->elementSize,
             l->elements + index*l->elementSize,
-            l->count*l->elementSize
+            (l->count - index)*l->elementSize
         );
     }
     setElement(l, index, element);
@@ -87,12 +88,61 @@ void *ListInsert(void *list, size_t index, void *element) {
     return l + 1;
 }
 
-void *ListAppend(void *list, void *element) {
+void *ListRemove(void *list, size_t index) {
+    struct List *l = getList(list);
+    assert(index < l->count);
+    memmove(
+        l->elements + index*l->elementSize,
+        l->elements + (index + 1)*l->elementSize,
+        (l->count - index - 1)*l->elementSize
+    );
+    --l->count;
+    return l + 1;
+}
+
+void *ListPushFront(void *list, void *element) {
+    return ListInsert(list, 0, element);
+}
+
+void *ListPushBack(void *list, void *element) {
     return ListInsert(list, ListGetCount(list), element);
 }
 
-void *ListPrepend(void *list, void *element) {
-    return ListInsert(list, 0, element);
+void *ListPopFront(void *list, size_t amount, void *result) {
+    assert(ListGetCount(list) >= amount && "Popped too many elements.");
+    if (amount == 0) {
+        return list;
+    }
+
+    if (result) {
+        memcpy(
+            result,
+            (char*)list + (amount - 1)*ListGetElementSize(list),
+            ListGetElementSize(list)
+        );    
+    }
+    memmove(
+        list,
+        (char*)list + amount*ListGetElementSize(list),
+        (ListGetCount(list) - amount)*ListGetElementSize(list)
+    );
+    return ListSetCount(list, ListGetCount(list) - amount);
+}
+
+void *ListPopBack(void *list, size_t amount, void *result) {
+    assert(ListGetCount(list) >= amount && "Popped too many elements.");
+    if (amount == 0) {
+        return list;
+    }
+
+    if (result) {
+        memcpy(
+            result,
+            (char*)list + (ListGetCount(list) - amount)*ListGetElementSize(list),
+            ListGetElementSize(list)
+        );    
+    }
+    return ListSetCount(list, ListGetCount(list) - amount);
 }
 
 #undef min
