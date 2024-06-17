@@ -6,8 +6,12 @@
 
 #define max(a, b) ((a) >= (b)) ? (a) : (b)
 
+// Returns a pointer to the beggining of actual list object pointed to by `elements`.
 #define getList(elements) ((struct List*)(elements) - 1)
 
+// The internal representation of a list. The programmer only ever interacts with a pointer to
+// `elements`. The capacity, count, and element size are allocated inline with the elements
+// themselves.
 struct List {
     size_t capacity;
     size_t count;
@@ -15,8 +19,9 @@ struct List {
 	char elements[];
 };
 
-static void setElement(struct List *list, size_t index, void *value) {
-    memcpy(list->elements + index*list->elementSize, value, list->elementSize);
+// Sets the element at an index in a list.
+static void setElement(struct List *list, size_t index, void *element) {
+    memcpy(list->elements + index*list->elementSize, element, list->elementSize);
 }
 
 void *ListCreate(size_t capacity, size_t elementSize) {

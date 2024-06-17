@@ -28,14 +28,14 @@ void *ListSetCapacity(void *list, size_t capacity);
 // Returns the current number of elements in a list.
 size_t ListGetCount(void *list);
 
-// Grows or shrinks the count of the list. Returns a pointer to the list or a new list if the
+// Grows or shrinks the count of a list. Returns a pointer to the list or a new list if the
 // capacity changes.
 void *ListSetCount(void *list, size_t count);
 
 // Returns the size in bytes of one element of a list.
 size_t ListGetElementSize(void *list);
 
-// Returns true if the list has 0 elements.
+// Returns true if a list has 0 elements.
 bool ListIsEmpty(void *list);
 
 // Inserts an element at an index in a list.
@@ -44,13 +44,14 @@ void *ListInsert(void *list, size_t index, void *element);
 // Removes the element at an index in a list.
 void *ListRemove(void *list, size_t index);
 
-// Prepends an element to the list.
+// Prepends an element to a list.
 void *ListPushFront(void *list, void *element);
 
-// Appends an element to the list.
+// Appends an element to a list.
 void *ListPushBack(void *list, void *element);
 
-// Pops a number of elements from the front of a list and stores the last element popped in `result`.
+// Pops a number of elements from the front of a list and stores the last element popped in
+// `result`.
 void *ListPopFront(void *list, size_t amount, void *result);
 
 // Pops a number of elements from the back of a list and stores the last element popped in `result`.
